@@ -96,6 +96,13 @@ def test_judge_vs_human_uses_matching_keys():
     assert out["n"] == 2 and out["exact"] == 0.5
 
 
+def test_question_rows_count_before_and_after():
+    row = metrics.question_rows([record(revisions=[{"claim_id": 3, "action": "removed"}])])[0]
+    assert row["draft_claims"] == 3 and row["final_claims"] == 1
+    assert row["unsupported_before"] == 1 and row["unsupported_after"] == 0
+    assert row["removed"] == 1 and row["models"] == ["m1"]
+
+
 def test_percentile_interpolates():
     assert metrics.percentile([1, 2, 3, 4], 0.5) == 2.5
     assert metrics.percentile([], 0.5) is None

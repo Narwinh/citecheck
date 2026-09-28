@@ -1,0 +1,195 @@
+{
+ "run": "dev30",
+ "summary": {
+  "questions": {
+   "total": 2,
+   "completed": 2,
+   "judged": 2,
+   "by_category": {
+    "factual": 2
+   }
+  },
+  "variants": {
+   "off": {
+    "claims": 6,
+    "judged": 6,
+    "unjudged": 0,
+    "support_rate": 1,
+    "partial_rate": 0,
+    "unsupported_rate": 0,
+    "citation_precision": 1,
+    "removal_rate": 0
+   },
+   "remove_strict": {
+    "claims": 6,
+    "judged": 6,
+    "unjudged": 0,
+    "support_rate": 1,
+    "partial_rate": 0,
+    "unsupported_rate": 0,
+    "citation_precision": 1,
+    "removal_rate": 0
+   },
+   "remove_lenient": {
+    "claims": 6,
+    "judged": 6,
+    "unjudged": 0,
+    "support_rate": 1,
+    "partial_rate": 0,
+    "unsupported_rate": 0,
+    "citation_precision": 1,
+    "removal_rate": 0
+   },
+   "revise_strict": {
+    "claims": 6,
+    "judged": 6,
+    "unjudged": 0,
+    "support_rate": 1,
+    "partial_rate": 0,
+    "unsupported_rate": 0,
+    "citation_precision": 1,
+    "removal_rate": 0
+   },
+   "revise_lenient": {
+    "claims": 6,
+    "judged": 6,
+    "unjudged": 0,
+    "support_rate": 1,
+    "partial_rate": 0,
+    "unsupported_rate": 0,
+    "citation_precision": 1,
+    "removal_rate": 0
+   }
+  },
+  "abstention": {
+   "off": {
+    "unanswerable_questions": 0,
+    "correct_abstentions": null,
+    "false_abstentions": 0
+   },
+   "revise_strict": {
+    "unanswerable_questions": 0,
+    "correct_abstentions": null,
+    "false_abstentions": 0
+   }
+  },
+  "latency": {
+   "total_p50_ms": 28455,
+   "total_p95_ms": 31695,
+   "per_agent": {
+    "planner": {
+     "p50": 8926.5,
+     "p95": 12547.65,
+     "n": 2
+    },
+    "retriever": {
+     "p50": 5291.5,
+     "p95": 5357.65,
+     "n": 2
+    },
+    "verifier": {
+     "p50": 6692.5,
+     "p95": 6808.15,
+     "n": 2
+    },
+    "writer": {
+     "p50": 7540,
+     "p95": 7972,
+     "n": 2
+    }
+   },
+   "samples": [
+    32055,
+    24855
+   ]
+  },
+  "tokens": {
+   "mean_tokens_per_question": 8668,
+   "mean_tokens_per_agent": {
+    "planner": 328,
+    "verifier": 2854,
+    "writer": 5486
+   },
+   "model_calls": {
+    "gemini-3.1-flash-lite": 6
+   }
+  },
+  "verifier_vs_judge": {
+   "n": 6,
+   "exact": 1,
+   "kappa": 1,
+   "pass_fail": 1
+  },
+  "judge_vs_human": {
+   "n": 0
+  },
+  "per_question": [
+   {
+    "id": "f01",
+    "category": "factual",
+    "question": "How tall is the Eiffel Tower?",
+    "status": "ok",
+    "writer_status": "answered",
+    "draft_claims": 4,
+    "final_claims": 4,
+    "revised": 0,
+    "removed": 0,
+    "unsupported_before": 0,
+    "unsupported_after": 0,
+    "judged": true,
+    "total_ms": 32055,
+    "models": [
+     "gemini-3.1-flash-lite"
+    ]
+   },
+   {
+    "id": "f02",
+    "category": "factual",
+    "question": "What is the boiling point of water at the summit of Mount Everest?",
+    "status": "ok",
+    "writer_status": "answered",
+    "draft_claims": 2,
+    "final_claims": 2,
+    "revised": 0,
+    "removed": 0,
+    "unsupported_before": 0,
+    "unsupported_after": 0,
+    "judged": true,
+    "total_ms": 24855,
+    "models": [
+     "gemini-3.1-flash-lite"
+    ]
+   }
+  ]
+ },
+ "config": {
+  "run_id": "dev30",
+  "written_at": "2026-09-28T15:57:28+00:00",
+  "git_commit": "94b0a25",
+  "benchmark": "eval\\benchmark.jsonl",
+  "benchmark_sha256": "ffbed19758657279",
+  "pipeline_mode": "strict",
+  "models": {
+   "primary": "gemini-3.8-flash",
+   "fallbacks": "gemini-3.7-flash,gemini-3.6-flash,gemini-3.1-flash-lite",
+   "judge": "gemini-2.5-flash",
+   "embedding": "gemini-embedding-001:768"
+  },
+  "thinking": {
+   "planner": "low",
+   "writer": "low",
+   "verifier": "low",
+   "reviser": "low"
+  },
+  "prompts": {
+   "planner": "planner_v1",
+   "writer": "writer_v1",
+   "verifier": "verifier_v1",
+   "reviser": "reviser_v1",
+   "judge": "judge_v1"
+  },
+  "retrieval": {
+   "tavily_max_results": 5
+  }
+ }
+}

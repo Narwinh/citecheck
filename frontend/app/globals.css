@@ -20,6 +20,9 @@
   --color-partial-soft: var(--partial-soft);
   --color-unsupported: var(--unsupported);
   --color-unsupported-soft: var(--unsupported-soft);
+  --color-chart-supported: var(--chart-supported);
+  --color-chart-partial: var(--chart-partial);
+  --color-chart-unsupported: var(--chart-unsupported);
 
   --font-serif: var(--font-newsreader), "Iowan Old Style", Georgia, serif;
   --font-mono: var(--font-plex-mono), ui-monospace, "SF Mono", Menlo, monospace;

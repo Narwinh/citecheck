@@ -188,6 +188,45 @@ def judge_vs_human(records: list[dict], human: list[dict]) -> dict[str, Any]:
     return agreement(pairs)
 
 
+def question_rows(records: list[dict]) -> list[dict[str, Any]]:
+    """One compact row per question for the frontend's browsable table."""
+    rows = []
+    for r in records:
+        base = {"id": r["id"], "category": r["category"], "question": r.get("question")}
+        if r.get("status") != "ok":
+            rows.append({**base, "status": "error"})
+            continue
+        judge = r.get("judge", {})
+        before = Counter((judge.get(k) or {}).get("label") for k in variant_keys(r, "off"))
+        after = Counter((judge.get(k) or {}).get("label") for k in variant_keys(r, "revise_strict"))
+        revisions = r.get("revisions", [])
+        models = sorted(
+            {
+                k.removeprefix("calls:")
+                for usage in r.get("token_usage", {}).values()
+                for k in usage
+                if k.startswith("calls:")
+            }
+        )
+        rows.append(
+            {
+                **base,
+                "status": "ok",
+                "writer_status": r.get("writer_status"),
+                "draft_claims": len(r.get("draft_claims", [])),
+                "final_claims": len(variant_keys(r, "revise_strict")),
+                "revised": sum(x["action"] == "rewritten" for x in revisions),
+                "removed": sum(x["action"] == "removed" for x in revisions),
+                "unsupported_before": before["UNSUPPORTED"],
+                "unsupported_after": after["UNSUPPORTED"],
+                "judged": bool(judge),
+                "total_ms": r.get("total_ms"),
+                "models": models,
+            }
+        )
+    return rows
+
+
 def summarize(records: list[dict], human: list[dict] | None = None) -> dict[str, Any]:
     ok = [r for r in records if r.get("status") == "ok"]
     judged = [r for r in ok if r.get("judge")]
@@ -204,4 +243,5 @@ def summarize(records: list[dict], human: list[dict] | None = None) -> dict[str,
         "tokens": token_metrics(ok),
         "verifier_vs_judge": verifier_vs_judge(judged),
         "judge_vs_human": judge_vs_human(judged, human or []),
+        "per_question": question_rows(records),
     }

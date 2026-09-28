@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { IBM_Plex_Mono, IBM_Plex_Sans, Newsreader } from "next/font/google";
+import Script from "next/script";
 import "./globals.css";
 
 const newsreader = Newsreader({
@@ -42,10 +43,12 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       suppressHydrationWarning
       className={`${newsreader.variable} ${plexMono.variable} ${plexSans.variable} h-full`}
     >
-      <head>
-        <script dangerouslySetInnerHTML={{ __html: themeScript }} />
-      </head>
-      <body className="relative min-h-full">{children}</body>
+      <body className="relative min-h-full">
+        <Script id="theme" strategy="beforeInteractive">
+          {themeScript}
+        </Script>
+        {children}
+      </body>
     </html>
   );
 }

@@ -120,5 +120,43 @@
   },
   "judge_vs_human": {
     "n": 0
-  }
+  },
+  "per_question": [
+    {
+      "id": "f01",
+      "category": "factual",
+      "question": "How tall is the Eiffel Tower?",
+      "status": "ok",
+      "writer_status": "answered",
+      "draft_claims": 4,
+      "final_claims": 4,
+      "revised": 0,
+      "removed": 0,
+      "unsupported_before": 0,
+      "unsupported_after": 0,
+      "judged": true,
+      "total_ms": 32055,
+      "models": [
+        "gemini-3.1-flash-lite"
+      ]
+    },
+    {
+      "id": "f02",
+      "category": "factual",
+      "question": "What is the boiling point of water at the summit of Mount Everest?",
+      "status": "ok",
+      "writer_status": "answered",
+      "draft_claims": 2,
+      "final_claims": 2,
+      "revised": 0,
+      "removed": 0,
+      "unsupported_before": 0,
+      "unsupported_after": 0,
+      "judged": true,
+      "total_ms": 24855,
+      "models": [
+        "gemini-3.1-flash-lite"
+      ]
+    }
+  ]
 }

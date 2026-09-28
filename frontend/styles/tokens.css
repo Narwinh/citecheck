@@ -35,6 +35,12 @@
   --unsupported: #9a3228;
   --unsupported-soft: #f3dbd5;
 
+  /* chart fills: the same three states with more lightness/chroma spread, so
+     they separate as areas (validated for CVD with the dataviz palette checker) */
+  --chart-supported: #2a9a60;
+  --chart-partial: #e3a91f;
+  --chart-unsupported: #9c2a22;
+
   --grain-opacity: 0.035;
   --shadow-card: 0 1px 0 rgb(29 26 22 / 0.04), 0 1px 3px rgb(29 26 22 / 0.06);
 }
@@ -61,6 +67,10 @@
   --unsupported: #e38d7f;
   --unsupported-soft: #321d19;
 
+  --chart-supported: #43a65f;
+  --chart-partial: #bf881e;
+  --chart-unsupported: #b24037;
+
   --grain-opacity: 0.05;
   --shadow-card: 0 1px 0 rgb(0 0 0 / 0.3), 0 2px 6px rgb(0 0 0 / 0.25);
 }
@@ -85,6 +95,9 @@
     --partial-soft: #2e2615;
     --unsupported: #e38d7f;
     --unsupported-soft: #321d19;
+    --chart-supported: #43a65f;
+    --chart-partial: #bf881e;
+    --chart-unsupported: #b24037;
     --grain-opacity: 0.05;
     --shadow-card: 0 1px 0 rgb(0 0 0 / 0.3), 0 2px 6px rgb(0 0 0 / 0.25);
   }

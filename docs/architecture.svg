@@ -1,0 +1,51 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 300" width="960" height="300" role="img" aria-labelledby="t d">
+  <title id="t">CiteCheck pipeline</title>
+  <desc id="d">Question to planner to retriever to writer to verifier to answer. Claims the verifier rejects go to the reviser, which rewrites or removes them; rewrites are checked once more.</desc>
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#585247"/>
+    </marker>
+    <style>
+      .box { fill: #faf8f2; stroke: #b6ac99; }
+      .hot { fill: #dde7ec; stroke: #245b78; stroke-width: 1.5; }
+      .t { font: 12px ui-monospace, Menlo, monospace; letter-spacing: .08em; fill: #1d1a16; }
+      .s { font: 13px Georgia, serif; fill: #585247; }
+      .k { font: 11px ui-monospace, Menlo, monospace; fill: #6b6456; }
+      .e { stroke: #585247; stroke-width: 1.5; fill: none; }
+    </style>
+  </defs>
+  <rect width="960" height="300" fill="#f5f1e8"/>
+  <text class="k" x="16" y="36">LANGGRAPH STATE GRAPH · EVERY STEP STREAMS EVENTS TO THE BROWSER</text>
+
+  <line class="e" x1="128" y1="112" x2="154" y2="112" marker-end="url(#a)"/>
+  <line class="e" x1="282" y1="112" x2="308" y2="112" marker-end="url(#a)"/>
+  <line class="e" x1="480" y1="112" x2="506" y2="112" marker-end="url(#a)"/>
+  <line class="e" x1="634" y1="112" x2="660" y2="112" marker-end="url(#a)"/>
+  <line class="e" x1="794" y1="112" x2="820" y2="112" marker-end="url(#a)"/>
+
+  <rect class="box" x="16" y="64" width="112" height="96" rx="6"/>
+  <text class="t" x="28" y="90">QUESTION</text><text class="s" x="28" y="114">from the reader</text>
+
+  <rect class="box" x="158" y="64" width="124" height="96" rx="6"/>
+  <text class="t" x="170" y="90">PLANNER</text><text class="s" x="170" y="114">1-4 web searches</text>
+
+  <rect class="box" x="312" y="64" width="168" height="96" rx="6"/>
+  <text class="t" x="324" y="90">RETRIEVER</text>
+  <text class="s" x="324" y="114">Tavily search</text><text class="s" x="324" y="130">Gemini embeddings</text><text class="s" x="324" y="146">in-memory Chroma</text>
+
+  <rect class="box" x="510" y="64" width="124" height="96" rx="6"/>
+  <text class="t" x="522" y="90">WRITER</text><text class="s" x="522" y="114">sentences, each</text><text class="s" x="522" y="130">citing passages</text>
+
+  <rect class="hot" x="664" y="64" width="130" height="96" rx="6"/>
+  <text class="t" x="676" y="90">VERIFIER</text><text class="s" x="676" y="114">reads the cited</text><text class="s" x="676" y="130">passage only</text>
+
+  <rect class="box" x="824" y="64" width="120" height="96" rx="6"/>
+  <text class="t" x="836" y="90">ANSWER</text><text class="s" x="836" y="114">with verdicts</text><text class="s" x="836" y="130">and evidence</text>
+
+  <rect class="box" x="664" y="206" width="130" height="66" rx="6"/>
+  <text class="t" x="676" y="230">REVISER</text><text class="s" x="676" y="252">rewrite or remove</text>
+  <path class="e" d="M700,160 L700,202" marker-end="url(#a)"/>
+  <path class="e" d="M758,206 L758,164" marker-end="url(#a)"/>
+  <text class="k" x="608" y="188">rejected</text>
+  <text class="k" x="766" y="188">re-check once</text>
+</svg>
