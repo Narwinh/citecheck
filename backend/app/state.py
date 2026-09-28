@@ -17,3 +17,9 @@ class Passage(BaseModel):
     @property
     def domain(self) -> str:
         return urlparse(self.url).netloc.removeprefix("www.")
+
+
+class Claim(BaseModel):
+    id: int  # 1-based, stable within one request
+    text: str
+    citation_ids: list[int]

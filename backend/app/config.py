@@ -40,6 +40,8 @@ class Settings(BaseModel):
     # 768 is a documented recommended size: 4x smaller than the 3072 default.
     embedding_dimensions: int = 768
     tavily_max_results: int = 5
+    # Gemini 3 thinking: minimal | low | medium | high. Measured per agent in the eval.
+    writer_thinking_level: str = "low"
     cache_dir: Path = Field(default=REPO_ROOT / "eval" / "cache")
 
     def missing_keys(self) -> list[str]:

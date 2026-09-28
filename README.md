@@ -16,3 +16,4 @@ pytest
 python scripts/smoke.py         # one real call each to Gemini and Tavily
 python scripts/retrieve.py "your question"   # numbered passages; rerun = cache hit
 ```
+Run `python scripts/write.py "your question"` for claims with citations (Stage 3).
