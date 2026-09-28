@@ -37,6 +37,9 @@ class Settings(BaseModel):
     # Model names change often; override via env instead of editing code.
     gemini_model: str = "gemini-3.8-flash"
     gemini_embedding_model: str = "gemini-embedding-001"
+    # 768 is a documented recommended size: 4x smaller than the 3072 default.
+    embedding_dimensions: int = 768
+    tavily_max_results: int = 5
     cache_dir: Path = Field(default=REPO_ROOT / "eval" / "cache")
 
     def missing_keys(self) -> list[str]:

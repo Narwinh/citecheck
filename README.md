@@ -14,4 +14,5 @@ pip install -e ".[dev]"
 copy ..\.env.example ..\.env    # then add your GEMINI_API_KEY and TAVILY_API_KEY
 pytest
 python scripts/smoke.py         # one real call each to Gemini and Tavily
+python scripts/retrieve.py "your question"   # numbered passages; rerun = cache hit
 ```
