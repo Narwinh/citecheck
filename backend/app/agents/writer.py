@@ -13,6 +13,7 @@ from typing import Any, Literal
 from langchain_core.runnables import Runnable
 from pydantic import BaseModel, Field
 
+from app.agents.llm import format_passages, invoke_structured, structured
 from app.prompts import render
 from app.state import Claim, Passage
 
@@ -40,34 +41,30 @@ class WriterResult:
     dropped_claims: int = 0  # claims left with zero valid citations
 
 
-class WriterError(RuntimeError):
-    pass
-
-
 _INLINE_MARKER = re.compile(r"\s*\[\d+(?:\s*,\s*\d+)*\]")
 
 
-def format_passages(passages: list[Passage]) -> str:
-    return "\n\n".join(f"[{p.id}] {p.title} ({p.domain})\n{p.text}" for p in passages)
+def clean_text(text: str) -> str:
+    return _INLINE_MARKER.sub("", text).strip()
+
+
+def valid_citations(ids: list[int], passages: list[Passage]) -> list[int]:
+    """Keep IDs that name a real passage, deduplicated, in the model's order."""
+    valid_ids = {p.id for p in passages}
+    return list(dict.fromkeys(i for i in ids if i in valid_ids))
 
 
 def structured_writer(llm: Any) -> Runnable:
-    return llm.with_structured_output(WriterOutput, include_raw=True)
-
-
-def usage_from(raw: Any) -> dict[str, int]:
-    meta = getattr(raw, "usage_metadata", None) or {}
-    return {k: int(meta.get(k, 0)) for k in ("input_tokens", "output_tokens", "total_tokens")}
+    return structured(llm, WriterOutput)
 
 
 def enforce_citations(output: WriterOutput, passages: list[Passage]) -> WriterResult:
-    valid_ids = {p.id for p in passages}
     claims: list[Claim] = []
     dropped_citations = dropped_claims = 0
     for draft in output.claims:
-        cited = list(dict.fromkeys(i for i in draft.citation_ids if i in valid_ids))
+        cited = valid_citations(draft.citation_ids, passages)
         dropped_citations += len(set(draft.citation_ids)) - len(cited)
-        text = _INLINE_MARKER.sub("", draft.text).strip()
+        text = clean_text(draft.text)
         if not cited or not text:
             dropped_claims += 1
             continue
@@ -84,11 +81,7 @@ def write(question: str, passages: list[Passage], writer: Runnable) -> WriterRes
         return WriterResult("unanswerable", [], "No sources were found for this question.")
 
     prompt = render(PROMPT, question=question, passages=format_passages(passages))
-    response = writer.invoke(prompt)
-    parsed = response.get("parsed")
-    if parsed is None:
-        raise WriterError(f"Writer returned unparseable output: {response.get('parsing_error')}")
-
+    parsed, usage = invoke_structured(writer, prompt, "Writer")
     result = enforce_citations(parsed, passages)
-    result.usage = usage_from(response.get("raw"))
+    result.usage = usage
     return result

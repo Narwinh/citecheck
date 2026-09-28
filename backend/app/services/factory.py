@@ -7,15 +7,25 @@ from app.services.embeddings import CachedEmbedder, gemini_embed_fn
 from app.services.search import CachedSearch
 
 
-def make_llm(settings: Settings, thinking_level: str) -> ChatGoogleGenerativeAI:
-    # Temperature is left unset: for Gemini 3 the integration defaults it to 1.0,
-    # and the docs warn lower values can cause loops and weaker reasoning.
-    return ChatGoogleGenerativeAI(
-        model=settings.gemini_model,
-        api_key=settings.gemini_api_key,
-        thinking_level=thinking_level,
-        max_retries=6,  # built-in exponential backoff, including 429s
-    )
+def make_llm(settings: Settings, thinking_level: str) -> list[ChatGoogleGenerativeAI]:
+    """Primary model first, then the fallback used when the primary errors (e.g. 503 overload).
+
+    Temperature is left unset: for Gemini 3 the integration defaults it to 1.0,
+    and the docs warn lower values can cause loops and weaker reasoning.
+    """
+    models = [settings.gemini_model]
+    if settings.gemini_fallback_model and settings.gemini_fallback_model != settings.gemini_model:
+        models.append(settings.gemini_fallback_model)
+    return [
+        ChatGoogleGenerativeAI(
+            model=name,
+            api_key=settings.gemini_api_key,
+            thinking_level=thinking_level,
+            # Few retries on the primary so an overloaded model hands off quickly.
+            max_retries=2 if i == 0 and len(models) > 1 else 6,
+        )
+        for i, name in enumerate(models)
+    ]
 
 
 def make_search(settings: Settings) -> CachedSearch:

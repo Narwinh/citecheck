@@ -1,46 +1,15 @@
 import pytest
-from langchain_core.messages import AIMessage
 
-from app.agents.writer import (
-    DraftClaim,
-    WriterError,
-    WriterOutput,
-    enforce_citations,
-    format_passages,
-    write,
-)
+from app.agents.llm import AgentOutputError, format_passages
+from app.agents.writer import DraftClaim, WriterOutput, enforce_citations, write
 from app.prompts import render
-from app.state import Passage
+from tests.fakes import FakeStructured, make_passages
+
+passages = make_passages
 
 
-def passages(n: int = 3) -> list[Passage]:
-    return [
-        Passage(
-            id=i,
-            url=f"https://www.site{i}.com/page",
-            title=f"Title {i}",
-            text=f"Passage {i} text.",
-            score=0.8,
-            sub_query="q",
-        )
-        for i in range(1, n + 1)
-    ]
-
-
-class FakeWriter:
-    """Mimics llm.with_structured_output(..., include_raw=True)."""
-
-    def __init__(self, parsed: WriterOutput | None, error: str | None = None):
-        self.parsed, self.error = parsed, error
-        self.prompts: list[str] = []
-
-    def invoke(self, prompt: str) -> dict:
-        self.prompts.append(prompt)
-        raw = AIMessage(
-            content="{}",
-            usage_metadata={"input_tokens": 100, "output_tokens": 20, "total_tokens": 120},
-        )
-        return {"raw": raw, "parsed": self.parsed, "parsing_error": self.error}
+def FakeWriter(parsed, error=None):  # noqa: N802 - reads like the class it wraps
+    return FakeStructured(parsed, error=error)
 
 
 def output(*claims: tuple[str, list[int]], status: str = "answered") -> WriterOutput:
@@ -107,7 +76,7 @@ def test_no_passages_skips_llm_and_abstains():
 
 
 def test_parse_failure_raises():
-    with pytest.raises(WriterError):
+    with pytest.raises(AgentOutputError):
         write("Q?", passages(), FakeWriter(None, error="bad json"))
 
 

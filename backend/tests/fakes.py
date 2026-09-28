@@ -4,7 +4,10 @@ import hashlib
 import re
 from typing import Any
 
+from langchain_core.messages import AIMessage
+
 from app.services.embeddings import TaskType, normalize
+from app.state import Passage
 
 DIMS = 64
 
@@ -32,3 +35,35 @@ def bag_of_words_embed(texts: list[str], task: TaskType) -> list[list[float]]:
 
 def page(url: str, text: str, title: str | None = None) -> dict[str, Any]:
     return {"url": url, "title": title or url, "content": text[:100], "raw_content": text}
+
+
+class FakeStructured:
+    """Mimics llm.with_structured_output(..., include_raw=True); returns outputs in order."""
+
+    def __init__(self, *outputs: Any, error: str | None = None):
+        self.outputs = list(outputs)
+        self.error = error
+        self.prompts: list[str] = []
+
+    def invoke(self, prompt: str) -> dict:
+        self.prompts.append(prompt)
+        parsed = self.outputs.pop(0) if self.outputs else None
+        raw = AIMessage(
+            content="{}",
+            usage_metadata={"input_tokens": 100, "output_tokens": 20, "total_tokens": 120},
+        )
+        return {"raw": raw, "parsed": parsed, "parsing_error": self.error}
+
+
+def make_passages(n: int = 3) -> list[Passage]:
+    return [
+        Passage(
+            id=i,
+            url=f"https://www.site{i}.com/page",
+            title=f"Title {i}",
+            text=f"Passage {i} text.",
+            score=0.8,
+            sub_query="q",
+        )
+        for i in range(1, n + 1)
+    ]
