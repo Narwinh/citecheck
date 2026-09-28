@@ -36,13 +36,19 @@ class Settings(BaseModel):
     tavily_api_key: str = ""
     # Model names change often; override via env instead of editing code.
     gemini_model: str = "gemini-3.8-flash"
-    # Used when the primary fails (503 "high demand" happens). Empty string disables it.
-    gemini_fallback_model: str = "gemini-3.7-flash"
+    # Comma-separated, tried in order when the model before fails (503 overload, or the
+    # free tier's 20 requests/day/model quota). Empty string disables fallback.
+    gemini_fallback_models: str = "gemini-3.7-flash,gemini-3.6-flash"
     gemini_embedding_model: str = "gemini-embedding-001"
     # 768 is a documented recommended size: 4x smaller than the 3072 default.
     embedding_dimensions: int = 768
     tavily_max_results: int = 5
+    max_sub_queries: int = 4
+    max_question_chars: int = 500
     # Gemini 3 thinking: minimal | low | medium | high. Measured per agent in the eval.
+    # "minimal" is not accepted by every Gemini 3 model (gemini-3.7-flash rejects it with
+    # a 400), which would break the fallback chain, so "low" is the floor.
+    planner_thinking_level: str = "low"
     writer_thinking_level: str = "low"
     verifier_thinking_level: str = "low"
     reviser_thinking_level: str = "low"

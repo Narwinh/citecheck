@@ -83,6 +83,68 @@ class CheckResult:
     usage: dict[str, dict[str, int]] = field(default_factory=dict)
 
 
+def rejected_claims(claims: list[Claim], verdicts: list[Verdict], mode: Mode) -> list[Claim]:
+    by_id = {v.claim_id: v for v in verdicts}
+    return [c for c in claims if not passes(by_id[c.id].label, mode)]
+
+
+@dataclass
+class RecheckResult:
+    revisions: list[Revision]  # sorted by claim id
+    rewrites: dict[int, Claim]  # claim id -> rewrite that passed re-verification
+    rewrite_verdicts: dict[int, Verdict]
+    reviser_usage: dict[str, int]
+    verifier_usage: dict[str, int]
+
+
+def revise_and_recheck(
+    question: str,
+    rejected: list[Claim],
+    verdicts: list[Verdict],
+    passages: list[Passage],
+    verifier: Runnable,
+    reviser: Runnable,
+    mode: Mode,
+) -> RecheckResult:
+    """One revision pass: rewrite or remove each rejected claim, then re-verify the rewrites."""
+    by_id = {v.claim_id: v for v in verdicts}
+    rewritten, revisions, reviser_usage = revise(question, rejected, by_id, passages, reviser)
+    second = verify(rewritten, passages, verifier)
+
+    rewrites: dict[int, Claim] = {}
+    rewrite_verdicts: dict[int, Verdict] = {}
+    for claim, verdict in zip(rewritten, second.verdicts, strict=True):
+        if passes(verdict.label, mode):
+            rewrites[claim.id] = claim
+            rewrite_verdicts[claim.id] = verdict
+            revisions.append(
+                Revision(
+                    claim_id=claim.id,
+                    action="rewritten",
+                    new_text=claim.text,
+                    new_citation_ids=claim.citation_ids,
+                )
+            )
+        else:
+            revisions.append(Revision(claim_id=claim.id, action="removed"))
+    revisions.sort(key=lambda r: r.claim_id)
+    return RecheckResult(revisions, rewrites, rewrite_verdicts, reviser_usage, second.usage)
+
+
+def assemble_final(
+    claims: list[Claim],
+    verdicts: list[Verdict],
+    revisions: list[Revision],
+    rewrites: dict[int, Claim],
+    rewrite_verdicts: dict[int, Verdict],
+) -> tuple[list[Claim], list[Verdict]]:
+    """Original order; rejected claims replaced by their passing rewrite or dropped."""
+    removed = {r.claim_id for r in revisions if r.action == "removed"}
+    by_id = {v.claim_id: v for v in verdicts} | rewrite_verdicts
+    final = [rewrites.get(c.id, c) for c in claims if c.id not in removed]
+    return final, [by_id[c.id] for c in final]
+
+
 def verify_and_revise(
     question: str,
     claims: list[Claim],
@@ -94,49 +156,21 @@ def verify_and_revise(
 ) -> CheckResult:
     first = verify(claims, passages, verifier)
     usage = {"verifier": first.usage}
-    verdicts = {v.claim_id: v for v in first.verdicts}
-    rejected = [c for c in claims if not passes(verdicts[c.id].label, mode)]
-
+    rejected = rejected_claims(claims, first.verdicts, mode)
     if not rejected:
         return CheckResult(first.verdicts, [], list(claims), first.verdicts, usage)
 
-    revisions: list[Revision] = []
-    kept_rewrites: dict[int, Claim] = {}
     if allow_revision:
-        rewritten, removed, usage["reviser"] = revise(
-            question, rejected, verdicts, passages, reviser
+        recheck = revise_and_recheck(
+            question, rejected, first.verdicts, passages, verifier, reviser, mode
         )
-        revisions.extend(removed)
-        second = verify(rewritten, passages, verifier)
-        usage["verifier"] = add_usage(usage["verifier"], second.usage)
-        for claim, verdict in zip(rewritten, second.verdicts, strict=True):
-            if passes(verdict.label, mode):
-                kept_rewrites[claim.id] = claim
-                verdicts[claim.id] = verdict
-                revisions.append(
-                    Revision(
-                        claim_id=claim.id,
-                        action="rewritten",
-                        new_text=claim.text,
-                        new_citation_ids=claim.citation_ids,
-                    )
-                )
-            else:
-                revisions.append(Revision(claim_id=claim.id, action="removed"))
+        usage["reviser"] = recheck.reviser_usage
+        usage["verifier"] = add_usage(usage["verifier"], recheck.verifier_usage)
     else:
-        revisions = [Revision(claim_id=c.id, action="removed") for c in rejected]
+        removals = [Revision(claim_id=c.id, action="removed") for c in rejected]
+        recheck = RecheckResult(removals, {}, {}, {}, {})
 
-    rejected_ids = {c.id for c in rejected}
-    final_claims = [
-        kept_rewrites.get(c.id, c)
-        for c in claims
-        if c.id not in rejected_ids or c.id in kept_rewrites
-    ]
-    revisions.sort(key=lambda r: r.claim_id)
-    return CheckResult(
-        first.verdicts,
-        revisions,
-        final_claims,
-        [verdicts[c.id] for c in final_claims],
-        usage,
+    final, final_verdicts = assemble_final(
+        claims, first.verdicts, recheck.revisions, recheck.rewrites, recheck.rewrite_verdicts
     )
+    return CheckResult(first.verdicts, recheck.revisions, final, final_verdicts, usage)
