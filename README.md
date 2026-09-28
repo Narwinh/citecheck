@@ -17,3 +17,7 @@ python scripts/smoke.py         # one real call each to Gemini and Tavily
 python scripts/retrieve.py "your question"   # numbered passages; rerun = cache hit
 ```
 Run `python scripts/write.py "your question"` for claims with citations (Stage 3).
+
+## Evaluation
+
+From the repo root: `backend\.venv\Scripts\python eval\run_eval.py --run-id dev30` runs the benchmark (resumable; stops cleanly when the free-tier daily quota runs out). Results go to `eval/results/<run-id>/`.

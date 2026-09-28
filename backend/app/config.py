@@ -38,7 +38,7 @@ class Settings(BaseModel):
     gemini_model: str = "gemini-3.8-flash"
     # Comma-separated, tried in order when the model before fails (503 overload, or the
     # free tier's 20 requests/day/model quota). Empty string disables fallback.
-    gemini_fallback_models: str = "gemini-3.7-flash,gemini-3.6-flash"
+    gemini_fallback_models: str = "gemini-3.7-flash,gemini-3.6-flash,gemini-3.1-flash-lite"
     gemini_embedding_model: str = "gemini-embedding-001"
     # 768 is a documented recommended size: 4x smaller than the 3072 default.
     embedding_dimensions: int = 768
@@ -48,6 +48,9 @@ class Settings(BaseModel):
     # Gemini 3 thinking: minimal | low | medium | high. Measured per agent in the eval.
     # "minimal" is not accepted by every Gemini 3 model (gemini-3.7-flash rejects it with
     # a 400), which would break the fallback chain, so "low" is the floor.
+    # Eval judge: a different model generation from the pipeline, so it isn't grading
+    # its own work. Comma-separated fallback chain; thinking left at model default.
+    judge_models: str = "gemini-2.5-flash"
     planner_thinking_level: str = "low"
     writer_thinking_level: str = "low"
     verifier_thinking_level: str = "low"

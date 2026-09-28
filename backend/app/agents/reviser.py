@@ -95,6 +95,9 @@ class RecheckResult:
     rewrite_verdicts: dict[int, Verdict]
     reviser_usage: dict[str, int]
     verifier_usage: dict[str, int]
+    # Every rewrite with its re-verification verdict, passing or not. The eval uses
+    # these to derive lenient-mode results from a strict run without new LLM calls.
+    attempts: list[tuple[Claim, Verdict]] = field(default_factory=list)
 
 
 def revise_and_recheck(
@@ -128,7 +131,10 @@ def revise_and_recheck(
         else:
             revisions.append(Revision(claim_id=claim.id, action="removed"))
     revisions.sort(key=lambda r: r.claim_id)
-    return RecheckResult(revisions, rewrites, rewrite_verdicts, reviser_usage, second.usage)
+    attempts = list(zip(rewritten, second.verdicts, strict=True))
+    return RecheckResult(
+        revisions, rewrites, rewrite_verdicts, reviser_usage, second.usage, attempts
+    )
 
 
 def assemble_final(

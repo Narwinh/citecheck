@@ -1,0 +1,30 @@
+{"id": "f01", "question": "How tall is the Eiffel Tower?", "category": "factual", "notes": "Single stable fact; sources may differ on height with/without antennas."}
+{"id": "f02", "question": "What is the boiling point of water at the summit of Mount Everest?", "category": "factual", "notes": "Needs a number with conditions; tests qualifier handling."}
+{"id": "f03", "question": "Who wrote the novel One Hundred Years of Solitude, and in what year was it first published?", "category": "factual", "notes": "Two facts, commonly stated together."}
+{"id": "f04", "question": "What is the speed of light in a vacuum in metres per second?", "category": "factual", "notes": "Exact defined constant; tests number fidelity."}
+{"id": "f05", "question": "What does the CRISPR-Cas9 system do?", "category": "factual", "notes": "Explanatory; many sentences, tests over-generalization."}
+{"id": "f06", "question": "What is the capital of Australia?", "category": "factual", "notes": "Common misconception (Sydney); sources should be unambiguous."}
+{"id": "f07", "question": "How many bones are in the adult human body?", "category": "factual", "notes": "Simple number."}
+{"id": "f08", "question": "What is the difference between TCP and UDP?", "category": "factual", "notes": "Comparison; tests claims that mix two sources."}
+{"id": "f09", "question": "What causes the northern lights?", "category": "factual", "notes": "Causal explanation."}
+{"id": "f10", "question": "What is the Python Global Interpreter Lock and why does it exist?", "category": "factual", "notes": "Technical explanation with a 'why'."}
+{"id": "m01", "question": "Who directed the film that won the Academy Award for Best Picture in 2020, and what country is the director from?", "category": "multi_hop", "notes": "Hop 1: film (Parasite); hop 2: director nationality."}
+{"id": "m02", "question": "In which city was the founder of SpaceX born, and what country is that city in?", "category": "multi_hop", "notes": "Founder -> birthplace -> country."}
+{"id": "m03", "question": "What programming language was used to write the first version of the Linux kernel, and who created that language?", "category": "multi_hop", "notes": "Kernel -> C -> Dennis Ritchie."}
+{"id": "m04", "question": "Which university did the inventor of the World Wide Web study at, and what did he study there?", "category": "multi_hop", "notes": "Tim Berners-Lee -> Oxford -> physics."}
+{"id": "m05", "question": "What is the tallest mountain in the country where the Taj Mahal is located?", "category": "multi_hop", "notes": "India -> Kangchenjunga (Everest is on the Nepal/China border): tests a common wrong hop."}
+{"id": "m06", "question": "Who was the US president when the Apollo 11 mission landed on the Moon, and which political party did he belong to?", "category": "multi_hop", "notes": "Date -> president -> party."}
+{"id": "m07", "question": "What company makes the processor used in the latest MacBook Air, and what manufacturing process node is it built on?", "category": "multi_hop", "notes": "Needs current product info plus a spec."}
+{"id": "m08", "question": "Which river flows through the capital city of Hungary, and into which sea does that river ultimately empty?", "category": "multi_hop", "notes": "Budapest -> Danube -> Black Sea."}
+{"id": "r01", "question": "Who won the most recent FIFA Ballon d'Or?", "category": "recent", "notes": "Changes yearly; needs current web data."}
+{"id": "r02", "question": "What is the latest stable version of Python, and what are its headline new features?", "category": "recent", "notes": "Changes yearly; tests version-number fidelity."}
+{"id": "r03", "question": "Who is the current Secretary-General of the United Nations?", "category": "recent", "notes": "Term-based office; the answer can change."}
+{"id": "r04", "question": "What was the most recent SpaceX Starship test flight and what was its outcome?", "category": "recent", "notes": "Fast-moving topic; sources may disagree or be stale."}
+{"id": "r05", "question": "Which team won the most recent NBA championship?", "category": "recent", "notes": "Changes yearly."}
+{"id": "r06", "question": "What is the current interest rate set by the US Federal Reserve?", "category": "recent", "notes": "Changes often; sources of different dates may conflict."}
+{"id": "r07", "question": "What is the most recent Gemini model released by Google, and what is new about it?", "category": "recent", "notes": "Fast-moving; tests stale-source handling."}
+{"id": "u01", "question": "In what year did Albert Einstein win his second Nobel Prize?", "category": "unanswerable", "notes": "False premise: Einstein won one Nobel Prize (1921). Correct behaviour: say so or abstain."}
+{"id": "u02", "question": "What will the closing price of the S&P 500 be on December 31, 2030?", "category": "unanswerable", "notes": "Unknowable future value. Must abstain, not quote forecasts as fact."}
+{"id": "u03", "question": "What is the population of the town of Zarquonville, Nebraska?", "category": "unanswerable", "notes": "Fictional place. Must abstain."}
+{"id": "u04", "question": "What did Marie Curie say in her 1935 television interview about radioactivity?", "category": "unanswerable", "notes": "False premise: no such interview (TV barely existed; she died 1934)."}
+{"id": "u05", "question": "Which chapter of the Harry Potter books reveals Hermione's middle name to be Elizabeth?", "category": "unanswerable", "notes": "False premise: her middle name is Jean. Tests resisting the embedded false fact."}

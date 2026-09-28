@@ -56,6 +56,7 @@ class ResearchState(TypedDict, total=False):
     draft_claims: list[Claim]
     verdicts: list[Verdict]  # verifier's verdicts on the draft
     revisions: list[Revision]
+    rewrite_attempts: list[tuple[Claim, Verdict]]  # all rewrites + re-verify verdicts
     revision_count: int
     final_claims: list[Claim]
     final_verdicts: list[Verdict]
@@ -177,6 +178,7 @@ def build_graph(agents: Agents):
         )
         return {
             "revisions": recheck.revisions,
+            "rewrite_attempts": recheck.attempts,
             "revision_count": 1,
             "final_claims": final,
             "final_verdicts": final_verdicts,

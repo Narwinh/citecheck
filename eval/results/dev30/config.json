@@ -1,0 +1,30 @@
+{
+  "run_id": "dev30",
+  "written_at": "2026-09-28T13:16:25+00:00",
+  "git_commit": "fe8ac2c",
+  "benchmark": "eval\\benchmark.jsonl",
+  "benchmark_sha256": "ffbed19758657279",
+  "pipeline_mode": "strict",
+  "models": {
+    "primary": "gemini-3.8-flash",
+    "fallbacks": "gemini-3.7-flash,gemini-3.6-flash,gemini-3.1-flash-lite",
+    "judge": "gemini-2.5-flash",
+    "embedding": "gemini-embedding-001:768"
+  },
+  "thinking": {
+    "planner": "low",
+    "writer": "low",
+    "verifier": "low",
+    "reviser": "low"
+  },
+  "prompts": {
+    "planner": "planner_v1",
+    "writer": "writer_v1",
+    "verifier": "verifier_v1",
+    "reviser": "reviser_v1",
+    "judge": "judge_v1"
+  },
+  "retrieval": {
+    "tavily_max_results": 5
+  }
+}

@@ -28,9 +28,21 @@ def make_llm(settings: Settings, thinking_level: str) -> list[ChatGoogleGenerati
             thinking_level=thinking_level,
             # No retries while another model is next in line: a 429 for an exhausted
             # daily quota won't clear by retrying, so hand off immediately.
-            max_retries=1 if i < len(models) - 1 else 6,
+            max_retries=1 if i < len(models) - 1 else 3,
         )
         for i, name in enumerate(models)
+    ]
+
+
+def make_judge_llm(settings: Settings) -> list[ChatGoogleGenerativeAI]:
+    names = [m.strip() for m in settings.judge_models.split(",") if m.strip()]
+    return [
+        ChatGoogleGenerativeAI(
+            model=name,
+            api_key=settings.gemini_api_key,
+            max_retries=1 if i < len(names) - 1 else 3,
+        )
+        for i, name in enumerate(names)
     ]
 
 

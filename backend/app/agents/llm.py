@@ -1,5 +1,6 @@
 """Helpers shared by the LLM-backed agents."""
 
+import re
 from typing import Any
 
 from langchain_core.runnables import Runnable
@@ -14,6 +15,54 @@ class AgentOutputError(RuntimeError):
     pass
 
 
+class AllModelsFailed(RuntimeError):
+    """Every model in the chain raised. Keeps each error, unlike LangChain's
+    with_fallbacks, which re-raises only the first one."""
+
+    def __init__(self, errors: list[Exception]):
+        self.errors = errors
+        super().__init__(" | ".join(describe_error(e) for e in errors))
+
+    @property
+    def daily_quota_exhausted(self) -> bool:
+        return all(is_daily_quota_error(e) for e in self.errors)
+
+
+def describe_error(exc: Exception) -> str:
+    """One short line per failure, e.g. "gemini-3.6-flash: 429 per-day quota"."""
+    text = str(exc)
+    model = re.search(r"model '([^']+)'", text)
+    if "RESOURCE_EXHAUSTED" in text:
+        reason = "429 per-day quota" if "PerDay" in text else "429 rate limit"
+        reason += " (per-minute)" if "PerMinute" in text else ""
+    elif "UNAVAILABLE" in text or "503" in text:
+        reason = "503 overloaded"
+    else:
+        reason = f"{type(exc).__name__}: {text[:160]}"
+    return f"{model.group(1)}: {reason}" if model else reason
+
+
+def is_daily_quota_error(exc: Exception) -> bool:
+    text = str(exc)
+    return "RESOURCE_EXHAUSTED" in text and "PerDay" in text
+
+
+class FallbackChain:
+    """Try each runnable in order until one succeeds."""
+
+    def __init__(self, runnables: list[Runnable]):
+        self.runnables = runnables
+
+    def invoke(self, prompt: Any) -> Any:
+        errors: list[Exception] = []
+        for runnable in self.runnables:
+            try:
+                return runnable.invoke(prompt)
+            except Exception as exc:  # noqa: BLE001 - any model failure moves to the next
+                errors.append(exc)
+        raise AllModelsFailed(errors)
+
+
 def structured(llm: Any, schema: type[BaseModel]) -> Runnable:
     """Structured output with the raw message kept (for token usage).
 
@@ -22,7 +71,7 @@ def structured(llm: Any, schema: type[BaseModel]) -> Runnable:
     """
     models = llm if isinstance(llm, list) else [llm]
     chains = [m.with_structured_output(schema, include_raw=True) for m in models]
-    return chains[0].with_fallbacks(chains[1:]) if len(chains) > 1 else chains[0]
+    return FallbackChain(chains) if len(chains) > 1 else chains[0]
 
 
 def usage_from(raw: Any) -> dict[str, int]:

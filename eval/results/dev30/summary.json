@@ -1,0 +1,124 @@
+{
+  "questions": {
+    "total": 2,
+    "completed": 2,
+    "judged": 2,
+    "by_category": {
+      "factual": 2
+    }
+  },
+  "variants": {
+    "off": {
+      "claims": 6,
+      "judged": 6,
+      "unjudged": 0,
+      "support_rate": 1.0,
+      "partial_rate": 0.0,
+      "unsupported_rate": 0.0,
+      "citation_precision": 1.0,
+      "removal_rate": 0.0
+    },
+    "remove_strict": {
+      "claims": 6,
+      "judged": 6,
+      "unjudged": 0,
+      "support_rate": 1.0,
+      "partial_rate": 0.0,
+      "unsupported_rate": 0.0,
+      "citation_precision": 1.0,
+      "removal_rate": 0.0
+    },
+    "remove_lenient": {
+      "claims": 6,
+      "judged": 6,
+      "unjudged": 0,
+      "support_rate": 1.0,
+      "partial_rate": 0.0,
+      "unsupported_rate": 0.0,
+      "citation_precision": 1.0,
+      "removal_rate": 0.0
+    },
+    "revise_strict": {
+      "claims": 6,
+      "judged": 6,
+      "unjudged": 0,
+      "support_rate": 1.0,
+      "partial_rate": 0.0,
+      "unsupported_rate": 0.0,
+      "citation_precision": 1.0,
+      "removal_rate": 0.0
+    },
+    "revise_lenient": {
+      "claims": 6,
+      "judged": 6,
+      "unjudged": 0,
+      "support_rate": 1.0,
+      "partial_rate": 0.0,
+      "unsupported_rate": 0.0,
+      "citation_precision": 1.0,
+      "removal_rate": 0.0
+    }
+  },
+  "abstention": {
+    "off": {
+      "unanswerable_questions": 0,
+      "correct_abstentions": null,
+      "false_abstentions": 0.0
+    },
+    "revise_strict": {
+      "unanswerable_questions": 0,
+      "correct_abstentions": null,
+      "false_abstentions": 0.0
+    }
+  },
+  "latency": {
+    "total_p50_ms": 28455.0,
+    "total_p95_ms": 31695.0,
+    "per_agent": {
+      "planner": {
+        "p50": 8926.5,
+        "p95": 12547.65,
+        "n": 2
+      },
+      "retriever": {
+        "p50": 5291.5,
+        "p95": 5357.65,
+        "n": 2
+      },
+      "verifier": {
+        "p50": 6692.5,
+        "p95": 6808.15,
+        "n": 2
+      },
+      "writer": {
+        "p50": 7540.0,
+        "p95": 7972.0,
+        "n": 2
+      }
+    },
+    "samples": [
+      32055,
+      24855
+    ]
+  },
+  "tokens": {
+    "mean_tokens_per_question": 8668,
+    "mean_tokens_per_agent": {
+      "planner": 328,
+      "verifier": 2854,
+      "writer": 5486
+    },
+    "model_calls": {
+      "gemini-3.1-flash-lite": 6
+    }
+  },
+  "verifier_vs_judge": {
+    "n": 6,
+    "exact": 1.0,
+    "kappa": 1.0,
+    "pass_fail": 1.0
+  },
+  "judge_vs_human": {
+    "n": 0
+  }
+}
