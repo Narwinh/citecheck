@@ -19,6 +19,7 @@ from typing import Any, Literal
 from fastapi import FastAPI, Header, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse, StreamingResponse
+from google.genai import errors as genai_errors
 from pydantic import BaseModel, Field, field_validator
 
 from app.agents.llm import AllModelsFailed
@@ -51,12 +52,18 @@ def error_payload(exc: BaseException) -> dict[str, str]:
             "message": "The research engine has used today's free model quota. "
             "Try again later, or add your own Gemini API key.",
         }
-    if isinstance(exc, AllModelsFailed):
+    if isinstance(exc, AllModelsFailed) or is_rate_limited(exc):
         return {
             "code": "unavailable",
-            "message": "The language model is overloaded right now. Please try again shortly.",
+            "message": "The model service is busy or rate-limited right now. "
+            "Please try again in a minute.",
         }
     return {"code": "internal", "message": "Something went wrong while researching this question."}
+
+
+def is_rate_limited(exc: BaseException) -> bool:
+    """A 429/503 from any Google API call outside the model chain (e.g. embeddings)."""
+    return isinstance(exc, genai_errors.APIError) and exc.code in (429, 503)
 
 
 def default_graph_factory(settings: Settings) -> GraphFactory:

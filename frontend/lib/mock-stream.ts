@@ -1,4 +1,4 @@
-﻿// A scripted event stream for building the UI without calling the backend.
+// A scripted event stream for building the UI without calling the backend.
 // Passages are written for this mock (not copied from real sites) and use
 // example.* domains. The script exercises every claim state: supported,
 // partial -> rewritten, and unsupported -> removed.

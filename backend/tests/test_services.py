@@ -64,7 +64,7 @@ def test_backoff_retries_429_then_succeeds():
         return "ok"
 
     assert with_backoff(flaky, sleep=sleeps.append) == "ok"
-    assert sleeps == [2, 4]
+    assert sleeps == [5, 10]
 
 
 def test_backoff_does_not_retry_bad_request():

@@ -1,6 +1,6 @@
 "use client";
 
-import { Check } from "lucide-react";
+import { Check, X } from "lucide-react";
 
 import { cn } from "@/lib/cn";
 import type { AgentStatus, ResearchState } from "@/lib/research";
@@ -24,6 +24,7 @@ function Node({ status }: { status: AgentStatus }) {
         status === "skipped" && "border-dashed border-rule-strong",
         status === "running" && "border-accent",
         status === "done" && "border-ink bg-ink text-paper",
+        status === "failed" && "border-ink-muted text-ink-muted",
       )}
     >
       {status === "running" && (
@@ -31,6 +32,7 @@ function Node({ status }: { status: AgentStatus }) {
       )}
       {status === "running" && <span className="size-1.5 rounded-full bg-accent" />}
       {status === "done" && <Check className="size-2.5" strokeWidth={3.5} />}
+      {status === "failed" && <X className="size-2.5" strokeWidth={3.5} />}
     </span>
   );
 }
@@ -39,6 +41,7 @@ function timing(status: AgentStatus, ms?: number) {
   if (status === "running") return "running";
   if (status === "done" && ms !== undefined) return `${ms.toLocaleString("en-US")} ms`;
   if (status === "skipped") return "not needed";
+  if (status === "failed") return "failed";
   return "waiting";
 }
 
@@ -56,7 +59,7 @@ export function AgentTimeline({
         const { status, ms } = agents[agent];
         const last = i === STEPS.length - 1;
         return (
-          <li key={agent} className="relative flex gap-3 pb-5 md:block md:pb-0 md:pr-4">
+          <li key={agent} className="relative flex gap-3 pb-3 md:block md:pb-0 md:pr-4">
             {/* connector: vertical on mobile, horizontal on desktop */}
             {!last && (
               <span
@@ -81,7 +84,9 @@ export function AgentTimeline({
                 <span className="sr-only">{label} status: </span>
                 {timing(status, ms)}
               </p>
-              <p className="mt-1 font-serif text-[0.8rem] leading-snug text-ink-muted italic">{blurb}</p>
+              <p className="mt-1 hidden font-serif text-[0.8rem] leading-snug text-ink-muted italic md:block">
+                {blurb}
+              </p>
               {agent === "planner" && subQueries.length > 0 && (
                 <ul className="mt-2 space-y-1">
                   {subQueries.map((q) => (

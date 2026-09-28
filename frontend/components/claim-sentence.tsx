@@ -19,6 +19,8 @@ const TEXT_STYLE: Record<ClaimView["state"], string> = {
 
 interface Props {
   claim: ClaimView;
+  /** Position in the answer; staggers the entrance animation. */
+  index?: number;
   active?: boolean;
   activeSource?: number | null;
   onActivate?: (claimId: number | null) => void;
@@ -26,9 +28,21 @@ interface Props {
   onSourceSelect?: (sourceId: number) => void;
 }
 
+// Inline text that wraps across lines has no single box, so these animate
+// opacity only; layout (position) animation would jump.
+const enter = (index: number, reduce: boolean | null) =>
+  reduce
+    ? {}
+    : {
+        initial: { opacity: 0 },
+        animate: { opacity: 1 },
+        transition: { duration: 0.45, delay: index * 0.08 },
+      };
+
 /** One sentence of the answer, decorated by its verification state. */
 export function ClaimSentence({
   claim,
+  index = 0,
   active,
   activeSource,
   onActivate,
@@ -40,9 +54,11 @@ export function ClaimSentence({
   if (claim.state === "removed") {
     return (
       <motion.span
-        layout={!reduce}
-        initial={false}
-        className="my-0.5 inline-flex items-center gap-1.5 rounded-sm border border-dashed border-unsupported/50 px-2 py-0.5 align-middle font-mono text-[0.72rem] text-unsupported"
+        key="removed"
+        initial={reduce ? false : { opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.4 }}
+        className="my-0.5 mr-1 inline-flex items-center gap-1.5 rounded-sm border border-dashed border-unsupported/50 px-2 py-0.5 align-middle font-mono text-[0.72rem] text-unsupported"
         title={claim.verdict?.rationale ?? claim.text}
       >
         <Minus aria-hidden className="size-3" strokeWidth={2.5} />
@@ -54,19 +70,20 @@ export function ClaimSentence({
 
   return (
     <motion.span
-      layout={!reduce}
+      {...enter(index, reduce)}
       tabIndex={0}
       role="button"
       aria-describedby={`claim-${claim.id}-state`}
       onMouseEnter={() => onActivate?.(claim.id)}
       onMouseLeave={() => onActivate?.(null)}
       onFocus={() => onActivate?.(claim.id)}
+      onBlur={() => onActivate?.(null)}
       className={cn(
-        "rounded-[2px] outline-none transition-colors [box-decoration-break:clone]",
+        "rounded-[2px] transition-colors duration-300 [box-decoration-break:clone]",
         active && "bg-paper-sunken",
       )}
     >
-      <AnimatePresence mode="popLayout" initial={false}>
+      <AnimatePresence mode="wait" initial={false}>
         <motion.span
           key={claim.text}
           initial={reduce ? false : { opacity: 0, filter: "blur(2px)" }}

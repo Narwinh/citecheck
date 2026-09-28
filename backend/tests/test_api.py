@@ -101,6 +101,16 @@ def test_pipeline_failure_becomes_an_error_event(tmp_path):
     assert events[0][1]["code"] == "quota"
 
 
+def test_embedding_rate_limit_maps_to_unavailable():
+    from google.genai import errors
+
+    from app.main import error_payload
+
+    exc = errors.ClientError(429, {"error": {"message": "quota"}})
+    assert error_payload(exc)["code"] == "unavailable"
+    assert error_payload(ValueError("boom"))["code"] == "internal"
+
+
 def test_rate_limiter_window_slides():
     now = [0.0]
     rl = RateLimiter(limit=2, window_s=10, clock=lambda: now[0])

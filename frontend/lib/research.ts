@@ -12,7 +12,7 @@ import type {
 
 export const AGENTS: AgentName[] = ["planner", "retriever", "writer", "verifier", "reviser"];
 
-export type AgentStatus = "idle" | "running" | "done" | "skipped";
+export type AgentStatus = "idle" | "running" | "done" | "skipped" | "failed";
 
 export type ClaimState =
   | "verifying"
@@ -115,8 +115,11 @@ export function reduce(state: ResearchState, e: ResearchEvent): ResearchState {
         stats: e.data.stats,
       };
     }
-    case "error":
-      return { ...state, phase: "error", error: e.data };
+    case "error": {
+      const agents = { ...state.agents };
+      for (const a of AGENTS) if (agents[a].status === "running") agents[a] = { status: "failed" };
+      return { ...state, phase: "error", agents, error: e.data };
+    }
   }
 }
 

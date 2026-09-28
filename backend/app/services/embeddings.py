@@ -14,6 +14,7 @@ from collections.abc import Callable
 from pathlib import Path
 from typing import Literal, TypeVar
 
+import httpx
 from google import genai
 from google.genai import errors, types
 
@@ -21,7 +22,9 @@ T = TypeVar("T")
 TaskType = Literal["RETRIEVAL_DOCUMENT", "RETRIEVAL_QUERY"]
 EmbedFn = Callable[[list[str], TaskType], list[list[float]]]
 
-BATCH_SIZE = 100
+# Small batches spread a question's ~50-80 chunks over several requests, so a
+# per-minute token limit on the free tier isn't hit in a single burst.
+BATCH_SIZE = 25
 MAX_RETRIES = 5
 
 
@@ -31,7 +34,7 @@ def normalize(vec: list[float]) -> list[float]:
 
 
 def is_retryable(exc: Exception) -> bool:
-    return isinstance(exc, errors.ServerError) or (
+    return isinstance(exc, errors.ServerError | httpx.TimeoutException) or (
         isinstance(exc, errors.ClientError) and exc.code == 429
     )
 
@@ -43,7 +46,8 @@ def with_backoff(call: Callable[[], T], sleep: Callable[[float], None] = time.sl
         except Exception as exc:
             if not is_retryable(exc) or attempt == MAX_RETRIES - 1:
                 raise
-            sleep(2 ** (attempt + 1))  # 2, 4, 8, 16 seconds
+            # 5, 10, 20, 40 s: 75 s in total, enough to outlast a one-minute quota window.
+            sleep(5 * 2**attempt)
     raise AssertionError("unreachable")
 
 
@@ -88,7 +92,14 @@ class CachedEmbedder:
 
 
 def gemini_embed_fn(api_key: str, model: str, dimensions: int) -> EmbedFn:
-    client = genai.Client(api_key=api_key)
+    # 60 s timeout (the SDK default is none, so a stalled request hangs forever);
+    # retries are left to with_backoff so they aren't doubled up inside the SDK.
+    client = genai.Client(
+        api_key=api_key,
+        http_options=types.HttpOptions(
+            timeout=60_000, retry_options=types.HttpRetryOptions(attempts=1)
+        ),
+    )
 
     def embed(texts: list[str], task: TaskType) -> list[list[float]]:
         result = with_backoff(

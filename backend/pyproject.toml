@@ -1,4 +1,4 @@
-﻿[project]
+[project]
 name = "citecheck"
 version = "0.1.0"
 description = "Multi-agent research assistant that verifies every citation it makes."

@@ -12,6 +12,9 @@ from app.graph import Agents
 from app.services.embeddings import CachedEmbedder, gemini_embed_fn
 from app.services.search import CachedSearch
 
+CHAIN_TIMEOUT_S = 60.0  # per attempt, when another model can take over
+LAST_TIMEOUT_S = 120.0  # the last model in the chain; the writer can take over a minute
+
 
 def make_llm(settings: Settings, thinking_level: str) -> list[ChatGoogleGenerativeAI]:
     """Primary model first, then the fallback used when the primary errors (e.g. 503 overload).
@@ -29,6 +32,8 @@ def make_llm(settings: Settings, thinking_level: str) -> list[ChatGoogleGenerati
             # No retries while another model is next in line: a 429 for an exhausted
             # daily quota won't clear by retrying, so hand off immediately.
             max_retries=1 if i < len(models) - 1 else 3,
+            # Without a timeout a stalled request hangs the pipeline forever (seen live).
+            timeout=CHAIN_TIMEOUT_S if i < len(models) - 1 else LAST_TIMEOUT_S,
         )
         for i, name in enumerate(models)
     ]
@@ -41,6 +46,7 @@ def make_judge_llm(settings: Settings) -> list[ChatGoogleGenerativeAI]:
             model=name,
             api_key=settings.gemini_api_key,
             max_retries=1 if i < len(names) - 1 else 3,
+            timeout=LAST_TIMEOUT_S,
         )
         for i, name in enumerate(names)
     ]
