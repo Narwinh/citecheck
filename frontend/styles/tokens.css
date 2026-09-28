@@ -1,0 +1,91 @@
+﻿/*
+ * CiteCheck design tokens: "Evidence Room".
+ *
+ * A near-monochrome paper/ink base plus exactly three semantic colours, used
+ * only for verification states, and one quiet accent for links and focus.
+ * Themes are selected by [data-theme] so any subtree can force a theme (the
+ * component sandbox renders both side by side).
+ *
+ * Contrast targets: body text >= 7:1 on paper, verdict text colours >= 4.5:1.
+ */
+
+:root,
+[data-theme="light"] {
+  color-scheme: light;
+
+  /* paper and ink */
+  --paper: #f5f1e8;
+  --paper-raised: #faf8f2;
+  --paper-sunken: #ece6da;
+  --ink: #1d1a16;
+  --ink-muted: #585247;
+  --ink-faint: #6b6456;
+  --rule: #d8d0c1;
+  --rule-strong: #b6ac99;
+
+  /* the only accent: links and focus */
+  --accent: #245b78;
+  --accent-soft: #dde7ec;
+
+  /* verification states (and nothing else) */
+  --supported: #2f6844;
+  --supported-soft: #dfeadf;
+  --partial: #8a5b0c;
+  --partial-soft: #f2e4c4;
+  --unsupported: #9a3228;
+  --unsupported-soft: #f3dbd5;
+
+  --grain-opacity: 0.035;
+  --shadow-card: 0 1px 0 rgb(29 26 22 / 0.04), 0 1px 3px rgb(29 26 22 / 0.06);
+}
+
+[data-theme="dark"] {
+  color-scheme: dark;
+
+  --paper: #141311;
+  --paper-raised: #1b1a17;
+  --paper-sunken: #0f0e0c;
+  --ink: #e3dccf;
+  --ink-muted: #aaa293;
+  --ink-faint: #857e71;
+  --rule: #2d2a25;
+  --rule-strong: #47423a;
+
+  --accent: #86b7d3;
+  --accent-soft: #1d2a31;
+
+  --supported: #86bd98;
+  --supported-soft: #1b2a20;
+  --partial: #dcae52;
+  --partial-soft: #2e2615;
+  --unsupported: #e38d7f;
+  --unsupported-soft: #321d19;
+
+  --grain-opacity: 0.05;
+  --shadow-card: 0 1px 0 rgb(0 0 0 / 0.3), 0 2px 6px rgb(0 0 0 / 0.25);
+}
+
+/* Follow the OS until the visitor picks a theme (the inline script sets data-theme). */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --paper: #141311;
+    --paper-raised: #1b1a17;
+    --paper-sunken: #0f0e0c;
+    --ink: #e3dccf;
+    --ink-muted: #aaa293;
+    --ink-faint: #857e71;
+    --rule: #2d2a25;
+    --rule-strong: #47423a;
+    --accent: #86b7d3;
+    --accent-soft: #1d2a31;
+    --supported: #86bd98;
+    --supported-soft: #1b2a20;
+    --partial: #dcae52;
+    --partial-soft: #2e2615;
+    --unsupported: #e38d7f;
+    --unsupported-soft: #321d19;
+    --grain-opacity: 0.05;
+    --shadow-card: 0 1px 0 rgb(0 0 0 / 0.3), 0 2px 6px rgb(0 0 0 / 0.25);
+  }
+}
