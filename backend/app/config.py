@@ -45,6 +45,10 @@ class Settings(BaseModel):
     tavily_max_results: int = 5
     max_sub_queries: int = 4
     max_question_chars: int = 500
+    # API
+    cors_origins: str = "http://localhost:3000"  # comma-separated; set to the Vercel URL
+    rate_limit_per_hour: int = 5  # per IP, on the server's own keys
+    trusted_proxies: int = 0  # 1 behind Hugging Face Spaces' proxy; 0 when run directly
     # Gemini 3 thinking: minimal | low | medium | high. Measured per agent in the eval.
     # "minimal" is not accepted by every Gemini 3 model (gemini-3.7-flash rejects it with
     # a 400), which would break the fallback chain, so "low" is the floor.

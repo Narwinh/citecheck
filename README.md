@@ -21,3 +21,7 @@ Run `python scripts/write.py "your question"` for claims with citations (Stage 3
 ## Evaluation
 
 From the repo root: `backend\.venv\Scripts\python eval\run_eval.py --run-id dev30` runs the benchmark (resumable; stops cleanly when the free-tier daily quota runs out). Results go to `eval/results/<run-id>/`.
+
+## API
+
+From `backend/`: `uvicorn app.main:app --reload --port 8000`. Endpoints: `GET /api/health`, `GET /api/examples`, `POST /api/ask` (SSE stream of `stage`, `subqueries`, `sources`, `draft`, `verdict`, `revision`, `final`, `error` events).

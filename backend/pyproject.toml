@@ -1,4 +1,4 @@
-[project]
+﻿[project]
 name = "citecheck"
 version = "0.1.0"
 description = "Multi-agent research assistant that verifies every citation it makes."
@@ -12,7 +12,6 @@ dependencies = [
     "chromadb>=1.5,<2",
     "fastapi>=0.141,<1",
     "uvicorn>=0.40",
-    "slowapi>=0.1.10,<0.2",
     "pydantic>=2.13,<3",
 ]
 
