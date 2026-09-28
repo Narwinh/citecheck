@@ -103,6 +103,16 @@ def test_question_rows_count_before_and_after():
     assert row["removed"] == 1 and row["models"] == ["m1"]
 
 
+def test_label_sample_balances_judge_labels_and_is_reproducible():
+    import label
+
+    records = {"q1": record(), "q2": record(id="q2")}
+    picked = label.sample(records, n=3, seed=1)
+    labels = {records[q]["judge"][k]["label"] for q, k in picked}
+    assert labels == {"SUPPORTED", "PARTIAL", "UNSUPPORTED"}
+    assert picked == label.sample(records, n=3, seed=1)
+
+
 def test_percentile_interpolates():
     assert metrics.percentile([1, 2, 3, 4], 0.5) == 2.5
     assert metrics.percentile([], 0.5) is None
