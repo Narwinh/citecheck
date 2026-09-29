@@ -107,10 +107,21 @@ def test_label_sample_balances_judge_labels_and_is_reproducible():
     import label
 
     records = {"q1": record(), "q2": record(id="q2")}
-    picked = label.sample(records, n=3, seed=1)
+    # 4 (judge, verifier) groups here: d1 S/S, d2 P/P, d3 U/U, r3 S/P
+    picked = label.sample(records, n=4, seed=1)
     labels = {records[q]["judge"][k]["label"] for q, k in picked}
     assert labels == {"SUPPORTED", "PARTIAL", "UNSUPPORTED"}
-    assert picked == label.sample(records, n=3, seed=1)
+    assert picked == label.sample(records, n=4, seed=1)
+
+
+def test_label_sample_includes_verifier_disagreements_when_judge_is_uniform():
+    import label
+
+    all_supported = {k: {"label": "SUPPORTED", "citations": {}} for k in ["d1", "d2", "d3"]}
+    records = {"q1": record(judge=all_supported)}
+    picked = label.sample(records, n=2, seed=3)
+    verifier_labels = {label.pipeline_label(records["q1"], k) for _, k in picked}
+    assert len(verifier_labels) == 2  # two different verifier labels, not two random claims
 
 
 def test_percentile_interpolates():

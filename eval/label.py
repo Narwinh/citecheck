@@ -32,19 +32,35 @@ from run_eval import judge_items, load_jsonl, load_results  # noqa: E402
 KEYS = {"s": "SUPPORTED", "p": "PARTIAL", "u": "UNSUPPORTED"}
 
 
+def pipeline_label(record: dict, key: str) -> str | None:
+    """The verifier's label for a draft claim ("d3") or a rewrite ("r3")."""
+    claim_id = int(key[1:])
+    if key.startswith("d"):
+        verdicts = record.get("verdicts", [])
+        return next((v["label"] for v in verdicts if v["claim_id"] == claim_id), None)
+    attempts = record.get("rewrite_attempts", [])
+    return next((a["verdict"]["label"] for a in attempts if a["claim"]["id"] == claim_id), None)
+
+
 def sample(records: dict[str, dict], n: int, seed: int) -> list[tuple[str, str]]:
-    """(question_id, item_key) pairs, balanced across the judge's labels where possible."""
-    by_label: dict[str, list[tuple[str, str]]] = {"SUPPORTED": [], "PARTIAL": [], "UNSUPPORTED": []}
+    """(question_id, item_key) pairs, balanced across (judge label, verifier label) groups.
+
+    Balancing on the judge alone fails when the judge gives nearly everything
+    the same label; the claims where judge and verifier disagree are the
+    informative ones, so every combination gets a fair share of the sample.
+    """
+    groups: dict[tuple, list[tuple[str, str]]] = {}
     for qid, r in sorted(records.items()):
         for key, j in (r.get("judge") or {}).items():
-            if j.get("label") in by_label:
-                by_label[j["label"]].append((qid, key))
+            if j.get("label"):
+                groups.setdefault((j["label"], pipeline_label(r, key)), []).append((qid, key))
     rng = random.Random(seed)
-    for pool in by_label.values():
+    pools = [groups[g] for g in sorted(groups, key=str)]
+    for pool in pools:
         rng.shuffle(pool)
     picked: list[tuple[str, str]] = []
-    while len(picked) < n and any(by_label.values()):
-        for pool in by_label.values():
+    while len(picked) < n and any(pools):
+        for pool in pools:
             if pool and len(picked) < n:
                 picked.append(pool.pop())
     rng.shuffle(picked)  # don't present them grouped by label
