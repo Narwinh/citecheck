@@ -1,9 +1,9 @@
 {
   "run_id": "dev30",
-  "written_at": "2026-09-28T15:57:28+00:00",
-  "git_commit": "94b0a25",
+  "written_at": "2026-09-29T05:40:41+00:00",
+  "git_commit": "d9ff3c6",
   "benchmark": "eval\\benchmark.jsonl",
-  "benchmark_sha256": "ffbed19758657279",
+  "benchmark_sha256": "9b50e4c8ff57d881",
   "pipeline_mode": "strict",
   "models": {
     "primary": "gemini-3.8-flash",

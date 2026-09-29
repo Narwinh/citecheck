@@ -107,6 +107,12 @@ export default function EvalPage() {
         <div className="grid gap-10 lg:grid-cols-2">
           <Section kicker="Latency" title="Where the time goes">
             <LatencyRanges perAgent={s.latency.per_agent} />
+            {(s.latency.excluded_outliers?.length ?? 0) > 0 && (
+              <p className="font-serif text-sm text-ink-faint italic">
+                Excluded from timing: {s.latency.excluded_outliers?.join(", ")} (over 10 minutes of wall-clock
+                time, from the evaluation machine sleeping mid-run). Their claims are still counted.
+              </p>
+            )}
           </Section>
           <Section kicker="Agreement" title="Can the judge be trusted?">
             <div className="grid gap-3 sm:grid-cols-2">
@@ -123,7 +129,8 @@ export default function EvalPage() {
             </div>
             <p className="font-serif text-sm text-ink-muted">
               An LLM judge is only useful if it agrees with people. A sample of claims is labelled by hand
-              and compared with the judge; kappa corrects agreement for chance.
+              and compared with the judge. Kappa corrects agreement for chance: if one side gives almost every
+              claim the same label, high raw agreement can still mean kappa near zero.
             </p>
           </Section>
         </div>

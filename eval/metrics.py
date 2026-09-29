@@ -108,16 +108,25 @@ def abstention_metrics(records: list[dict]) -> dict[str, Any]:
     return out
 
 
+# A run slower than this is a wall-clock artefact (seen: the machine slept for
+# 7 hours mid-call), not pipeline latency. Its claims are still valid; only its
+# timing is left out, and the count of excluded runs is reported.
+LATENCY_CAP_MS = 10 * 60 * 1000
+
+
 def latency_metrics(records: list[dict]) -> dict[str, Any]:
-    totals = [r["total_ms"] for r in records if r.get("total_ms") is not None]
-    agents = sorted({a for r in records for a in r.get("timings_ms", {})})
+    timed = [r for r in records if r.get("total_ms") is not None]
+    valid = [r for r in timed if r["total_ms"] <= LATENCY_CAP_MS]
+    totals = [r["total_ms"] for r in valid]
+    agents = sorted({a for r in valid for a in r.get("timings_ms", {})})
     per_agent = {}
     for a in agents:
-        vals = [r["timings_ms"][a] for r in records if a in r.get("timings_ms", {})]
+        vals = [r["timings_ms"][a] for r in valid if a in r.get("timings_ms", {})]
         per_agent[a] = {"p50": percentile(vals, 0.5), "p95": percentile(vals, 0.95), "n": len(vals)}
     return {
         "total_p50_ms": percentile(totals, 0.5),
         "total_p95_ms": percentile(totals, 0.95),
+        "excluded_outliers": [r["id"] for r in timed if r["total_ms"] > LATENCY_CAP_MS],
         "per_agent": per_agent,
         "samples": totals,
     }

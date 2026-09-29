@@ -1,16 +1,18 @@
 {
   "questions": {
-    "total": 2,
-    "completed": 2,
-    "judged": 2,
+    "total": 30,
+    "completed": 14,
+    "judged": 11,
     "by_category": {
-      "factual": 2
+      "factual": 8,
+      "multi_hop": 5,
+      "recent": 1
     }
   },
   "variants": {
     "off": {
-      "claims": 6,
-      "judged": 6,
+      "claims": 41,
+      "judged": 41,
       "unjudged": 0,
       "support_rate": 1.0,
       "partial_rate": 0.0,
@@ -19,18 +21,18 @@
       "removal_rate": 0.0
     },
     "remove_strict": {
-      "claims": 6,
-      "judged": 6,
+      "claims": 38,
+      "judged": 38,
       "unjudged": 0,
       "support_rate": 1.0,
       "partial_rate": 0.0,
       "unsupported_rate": 0.0,
       "citation_precision": 1.0,
-      "removal_rate": 0.0
+      "removal_rate": 0.0732
     },
     "remove_lenient": {
-      "claims": 6,
-      "judged": 6,
+      "claims": 41,
+      "judged": 41,
       "unjudged": 0,
       "support_rate": 1.0,
       "partial_rate": 0.0,
@@ -39,18 +41,18 @@
       "removal_rate": 0.0
     },
     "revise_strict": {
-      "claims": 6,
-      "judged": 6,
+      "claims": 39,
+      "judged": 39,
       "unjudged": 0,
       "support_rate": 1.0,
       "partial_rate": 0.0,
       "unsupported_rate": 0.0,
       "citation_precision": 1.0,
-      "removal_rate": 0.0
+      "removal_rate": 0.0488
     },
     "revise_lenient": {
-      "claims": 6,
-      "judged": 6,
+      "claims": 41,
+      "judged": 41,
       "unjudged": 0,
       "support_rate": 1.0,
       "partial_rate": 0.0,
@@ -72,51 +74,74 @@
     }
   },
   "latency": {
-    "total_p50_ms": 28455.0,
-    "total_p95_ms": 31695.0,
+    "total_p50_ms": 37084.0,
+    "total_p95_ms": 78516.79999999997,
+    "excluded_outliers": [
+      "m08"
+    ],
     "per_agent": {
       "planner": {
-        "p50": 8926.5,
-        "p95": 12547.65,
-        "n": 2
+        "p50": 8623.0,
+        "p95": 31612.399999999998,
+        "n": 13
       },
       "retriever": {
-        "p50": 5291.5,
-        "p95": 5357.65,
-        "n": 2
+        "p50": 9234.0,
+        "p95": 18423.79999999999,
+        "n": 13
+      },
+      "reviser": {
+        "p50": 15425.0,
+        "p95": 20789.5,
+        "n": 6
       },
       "verifier": {
-        "p50": 6692.5,
-        "p95": 6808.15,
-        "n": 2
+        "p50": 7797.0,
+        "p95": 21020.799999999996,
+        "n": 13
       },
       "writer": {
-        "p50": 7540.0,
-        "p95": 7972.0,
-        "n": 2
+        "p50": 7736.0,
+        "p95": 21547.399999999998,
+        "n": 13
       }
     },
     "samples": [
       32055,
-      24855
+      24855,
+      55236,
+      70109,
+      35546,
+      89834,
+      56375,
+      25124,
+      37084,
+      33485,
+      70972,
+      62920,
+      30939
     ]
   },
   "tokens": {
-    "mean_tokens_per_question": 8668,
+    "mean_tokens_per_question": 14179,
     "mean_tokens_per_agent": {
-      "planner": 328,
-      "verifier": 2854,
-      "writer": 5486
+      "planner": 311,
+      "verifier": 5102,
+      "writer": 6231,
+      "reviser": 2535
     },
     "model_calls": {
-      "gemini-3.1-flash-lite": 6
+      "gemini-3.1-flash-lite": 45,
+      "gemini-3.6-flash": 4,
+      "gemini-3.8-flash": 4,
+      "gemini-3.7-flash": 1
     }
   },
   "verifier_vs_judge": {
-    "n": 6,
-    "exact": 1.0,
-    "kappa": 1.0,
-    "pass_fail": 1.0
+    "n": 41,
+    "exact": 0.9268,
+    "kappa": 0.0,
+    "pass_fail": 0.9268
   },
   "judge_vs_human": {
     "n": 0
@@ -157,6 +182,326 @@
       "models": [
         "gemini-3.1-flash-lite"
       ]
+    },
+    {
+      "id": "f03",
+      "category": "factual",
+      "question": "Who wrote the novel One Hundred Years of Solitude, and in what year was it first published?",
+      "status": "ok",
+      "writer_status": "answered",
+      "draft_claims": 2,
+      "final_claims": 2,
+      "revised": 0,
+      "removed": 0,
+      "unsupported_before": 0,
+      "unsupported_after": 0,
+      "judged": true,
+      "total_ms": 55236,
+      "models": [
+        "gemini-3.1-flash-lite",
+        "gemini-3.6-flash"
+      ]
+    },
+    {
+      "id": "f04",
+      "category": "factual",
+      "question": "What is the speed of light in a vacuum in metres per second?",
+      "status": "ok",
+      "writer_status": "answered",
+      "draft_claims": 3,
+      "final_claims": 2,
+      "revised": 0,
+      "removed": 1,
+      "unsupported_before": 0,
+      "unsupported_after": 0,
+      "judged": true,
+      "total_ms": 70109,
+      "models": [
+        "gemini-3.1-flash-lite",
+        "gemini-3.8-flash"
+      ]
+    },
+    {
+      "id": "f05",
+      "category": "factual",
+      "question": "What does the CRISPR-Cas9 system do?",
+      "status": "error"
+    },
+    {
+      "id": "f06",
+      "category": "factual",
+      "question": "What is the capital of Australia?",
+      "status": "error"
+    },
+    {
+      "id": "f07",
+      "category": "factual",
+      "question": "How many bones are in the adult human body?",
+      "status": "ok",
+      "writer_status": "answered",
+      "draft_claims": 4,
+      "final_claims": 4,
+      "revised": 0,
+      "removed": 0,
+      "unsupported_before": 0,
+      "unsupported_after": 0,
+      "judged": true,
+      "total_ms": 35546,
+      "models": [
+        "gemini-3.1-flash-lite",
+        "gemini-3.6-flash"
+      ]
+    },
+    {
+      "id": "f08",
+      "category": "factual",
+      "question": "What is the difference between TCP and UDP?",
+      "status": "ok",
+      "writer_status": "answered",
+      "draft_claims": 8,
+      "final_claims": 8,
+      "revised": 1,
+      "removed": 0,
+      "unsupported_before": 0,
+      "unsupported_after": 0,
+      "judged": true,
+      "total_ms": 89834,
+      "models": [
+        "gemini-3.1-flash-lite",
+        "gemini-3.8-flash"
+      ]
+    },
+    {
+      "id": "f09",
+      "category": "factual",
+      "question": "What causes the northern lights?",
+      "status": "ok",
+      "writer_status": "answered",
+      "draft_claims": 7,
+      "final_claims": 7,
+      "revised": 1,
+      "removed": 0,
+      "unsupported_before": 0,
+      "unsupported_after": 0,
+      "judged": false,
+      "total_ms": 56375,
+      "models": [
+        "gemini-3.1-flash-lite",
+        "gemini-3.6-flash"
+      ]
+    },
+    {
+      "id": "f10",
+      "category": "factual",
+      "question": "What is the Python Global Interpreter Lock and why does it exist?",
+      "status": "ok",
+      "writer_status": "answered",
+      "draft_claims": 6,
+      "final_claims": 6,
+      "revised": 0,
+      "removed": 0,
+      "unsupported_before": 0,
+      "unsupported_after": 0,
+      "judged": true,
+      "total_ms": 25124,
+      "models": [
+        "gemini-3.1-flash-lite"
+      ]
+    },
+    {
+      "id": "m01",
+      "category": "multi_hop",
+      "question": "Who directed the film that won the Academy Award for Best Picture in 2020, and what country is the director from?",
+      "status": "error"
+    },
+    {
+      "id": "m02",
+      "category": "multi_hop",
+      "question": "In which city was the founder of SpaceX born, and what country is that city in?",
+      "status": "ok",
+      "writer_status": "answered",
+      "draft_claims": 3,
+      "final_claims": 3,
+      "revised": 0,
+      "removed": 0,
+      "unsupported_before": 0,
+      "unsupported_after": 0,
+      "judged": true,
+      "total_ms": 37084,
+      "models": [
+        "gemini-3.1-flash-lite"
+      ]
+    },
+    {
+      "id": "m03",
+      "category": "multi_hop",
+      "question": "What programming language was used to write the first version of the Linux kernel, and who created that language?",
+      "status": "error"
+    },
+    {
+      "id": "m04",
+      "category": "multi_hop",
+      "question": "Which university did the inventor of the World Wide Web study at, and what did he study there?",
+      "status": "ok",
+      "writer_status": "answered",
+      "draft_claims": 3,
+      "final_claims": 3,
+      "revised": 0,
+      "removed": 0,
+      "unsupported_before": 0,
+      "unsupported_after": 0,
+      "judged": true,
+      "total_ms": 33485,
+      "models": [
+        "gemini-3.1-flash-lite"
+      ]
+    },
+    {
+      "id": "m05",
+      "category": "multi_hop",
+      "question": "What is the tallest mountain in the country where the Taj Mahal is located?",
+      "status": "ok",
+      "writer_status": "answered",
+      "draft_claims": 4,
+      "final_claims": 4,
+      "revised": 1,
+      "removed": 0,
+      "unsupported_before": 0,
+      "unsupported_after": 0,
+      "judged": false,
+      "total_ms": 70972,
+      "models": [
+        "gemini-3.1-flash-lite"
+      ]
+    },
+    {
+      "id": "m06",
+      "category": "multi_hop",
+      "question": "Who was the US president when the Apollo 11 mission landed on the Moon, and which political party did he belong to?",
+      "status": "ok",
+      "writer_status": "answered",
+      "draft_claims": 2,
+      "final_claims": 2,
+      "revised": 1,
+      "removed": 0,
+      "unsupported_before": 0,
+      "unsupported_after": 0,
+      "judged": false,
+      "total_ms": 62920,
+      "models": [
+        "gemini-3.1-flash-lite"
+      ]
+    },
+    {
+      "id": "m07",
+      "category": "multi_hop",
+      "question": "What company makes the processor used in the latest MacBook Air, and what manufacturing process node is it built on?",
+      "status": "error"
+    },
+    {
+      "id": "m08",
+      "category": "multi_hop",
+      "question": "Which river flows through the capital city of Hungary, and into which sea does that river ultimately empty?",
+      "status": "ok",
+      "writer_status": "answered",
+      "draft_claims": 3,
+      "final_claims": 3,
+      "revised": 0,
+      "removed": 0,
+      "unsupported_before": 0,
+      "unsupported_after": 0,
+      "judged": true,
+      "total_ms": 26210876,
+      "models": [
+        "gemini-3.1-flash-lite",
+        "gemini-3.7-flash",
+        "gemini-3.8-flash"
+      ]
+    },
+    {
+      "id": "r01",
+      "category": "recent",
+      "question": "Who won the most recent FIFA Ballon d'Or?",
+      "status": "ok",
+      "writer_status": "answered",
+      "draft_claims": 3,
+      "final_claims": 2,
+      "revised": 0,
+      "removed": 1,
+      "unsupported_before": 0,
+      "unsupported_after": 0,
+      "judged": true,
+      "total_ms": 30939,
+      "models": [
+        "gemini-3.1-flash-lite",
+        "gemini-3.6-flash"
+      ]
+    },
+    {
+      "id": "r02",
+      "category": "recent",
+      "question": "What is the latest stable version of Python, and what are its headline new features?",
+      "status": "error"
+    },
+    {
+      "id": "r03",
+      "category": "recent",
+      "question": "Who is the current Secretary-General of the United Nations?",
+      "status": "error"
+    },
+    {
+      "id": "r04",
+      "category": "recent",
+      "question": "What was the most recent SpaceX Starship test flight and what was its outcome?",
+      "status": "error"
+    },
+    {
+      "id": "r05",
+      "category": "recent",
+      "question": "Which team won the most recent NBA championship?",
+      "status": "error"
+    },
+    {
+      "id": "r06",
+      "category": "recent",
+      "question": "What is the current interest rate set by the US Federal Reserve?",
+      "status": "error"
+    },
+    {
+      "id": "r07",
+      "category": "recent",
+      "question": "What is the most recent Gemini model released by Google, and what is new about it?",
+      "status": "error"
+    },
+    {
+      "id": "u01",
+      "category": "unanswerable",
+      "question": "In what year did Albert Einstein win his second Nobel Prize?",
+      "status": "error"
+    },
+    {
+      "id": "u02",
+      "category": "unanswerable",
+      "question": "What will the closing price of the S&P 500 be on December 31, 2030?",
+      "status": "error"
+    },
+    {
+      "id": "u03",
+      "category": "unanswerable",
+      "question": "What is the population of the town of Zarquonville, Nebraska?",
+      "status": "error"
+    },
+    {
+      "id": "u04",
+      "category": "unanswerable",
+      "question": "What did Marie Curie say in her 1935 television interview about radioactivity?",
+      "status": "error"
+    },
+    {
+      "id": "u05",
+      "category": "unanswerable",
+      "question": "Which chapter of the Harry Potter books reveals Hermione's middle name to be Elizabeth?",
+      "status": "error"
     }
   ]
 }

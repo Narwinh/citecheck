@@ -128,6 +128,14 @@ def _call_with_rate_retry(fn, *args, **kwargs):
                 raise
             print(f"    per-minute rate limit, waiting {PER_MINUTE_WAIT_S}s")
             time.sleep(PER_MINUTE_WAIT_S)
+        except Exception as exc:
+            # A 429 from outside the model chain (embeddings: 1,000 texts/day on the
+            # free tier; the single-model judge) that survived the call's own
+            # backoff is a daily quota, not a blip: stop instead of failing every
+            # remaining question the same way.
+            if "RESOURCE_EXHAUSTED" in str(exc):
+                raise QuotaExhausted(str(exc)) from exc
+            raise
     raise AssertionError("unreachable")
 
 

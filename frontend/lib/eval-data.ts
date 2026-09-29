@@ -52,6 +52,7 @@ export interface EvalData {
     latency: {
       total_p50_ms: number | null;
       total_p95_ms: number | null;
+      excluded_outliers?: string[];
       per_agent: Record<string, { p50: number | null; p95: number | null; n: number }>;
       samples: number[];
     };

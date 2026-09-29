@@ -187,6 +187,24 @@ def test_run_benchmark_stops_cleanly_on_daily_quota(tmp_path):
     assert list(run_eval.load_results(out / "results.jsonl")) == ["q0"]
 
 
+def test_embedding_quota_error_stops_the_run(tmp_path):
+    class EmbedQuotaGraph(FakeGraph):
+        def invoke(self, state):
+            self.calls += 1
+            raise RuntimeError("429 RESOURCE_EXHAUSTED embed_content_free_tier_requests")
+
+    graph = EmbedQuotaGraph()
+    finished = run_eval.run_benchmark(ITEMS, graph, judge_llm(), tmp_path / "o", tmp_path)
+    assert finished is False and graph.calls == 1
+
+
+def test_latency_outliers_are_excluded_but_reported():
+    slow = record(id="q9", total_ms=metrics.LATENCY_CAP_MS + 1)
+    out = metrics.latency_metrics([record(), slow])
+    assert out["excluded_outliers"] == ["q9"]
+    assert out["total_p50_ms"] == 2000
+
+
 def test_committed_record_has_snippets_not_full_text(tmp_path):
     run_eval.run_benchmark(ITEMS[:1], FakeGraph(), judge_llm(), tmp_path / "o", tmp_path / "f")
     rec = run_eval.load_results(tmp_path / "o" / "results.jsonl")["q0"]
