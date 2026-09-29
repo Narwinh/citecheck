@@ -114,6 +114,14 @@ def test_label_sample_balances_judge_labels_and_is_reproducible():
     assert picked == label.sample(records, n=4, seed=1)
 
 
+def test_label_preview_picks_overlapping_sentences_in_order():
+    import label
+
+    text = "Menus and tickets. The tower is 312 metres tall. Buy souvenirs here. It opened in 1889."
+    out = label.preview(text, "The tower is 312 metres tall and opened in 1889.", k=2)
+    assert out == ["The tower is 312 metres tall.", "It opened in 1889."]
+
+
 def test_label_sample_includes_verifier_disagreements_when_judge_is_uniform():
     import label
 

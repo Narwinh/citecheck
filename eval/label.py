@@ -16,7 +16,9 @@ Use the same definitions the judge uses (eval/prompts/judge_v1.md):
 
 import argparse
 import json
+import os
 import random
+import re
 import sys
 import textwrap
 from datetime import UTC, datetime
@@ -30,6 +32,62 @@ from app.config import get_settings  # noqa: E402
 from run_eval import judge_items, load_jsonl, load_results  # noqa: E402
 
 KEYS = {"s": "SUPPORTED", "p": "PARTIAL", "u": "UNSUPPORTED"}
+
+
+PREVIEW_SENTENCES = 3
+STOPWORDS = {
+    "a", "an", "the", "of", "in", "on", "at", "to", "for", "and", "or", "but", "is", "are",
+    "was", "were", "be", "been", "by", "with", "as", "from", "that", "this", "it", "its",
+    "into", "than", "then", "there", "their", "they", "which", "who", "what", "when",
+    "where", "how", "some",
+}  # fmt: skip
+HIGHLIGHT, RESET = "\033[1;33m", "\033[0m"
+
+
+def words(text: str) -> set[str]:
+    return {w for w in re.findall(r"[a-z0-9]+(?:\.[0-9]+)?", text.lower()) if w not in STOPWORDS}
+
+
+def highlight(text: str, claim_words: set[str]) -> str:
+    return re.sub(
+        r"[A-Za-z0-9]+(?:\.[0-9]+)?",
+        lambda m: (
+            f"{HIGHLIGHT}{m.group()}{RESET}" if m.group().lower() in claim_words else m.group()
+        ),
+        text,
+    )
+
+
+def preview(text: str, claim: str, k: int = PREVIEW_SENTENCES) -> list[str]:
+    """The k sentences sharing the most words with the claim, in passage order.
+
+    Pure word overlap, no model involved, so the preview can't hint at a label.
+    It can miss the deciding sentence, which is why the full text is one key away.
+    """
+    sentences = [s for s in re.split(r"(?<=[.!?])\s+", " ".join(text.split())) if s]
+    target = words(claim)
+    ranked = sorted(range(len(sentences)), key=lambda i: -len(words(sentences[i]) & target))
+    return [sentences[i] for i in sorted(ranked[:k])]
+
+
+def show(i: int, total: int, qid: str, question: str, claim: str, cited: list[dict], full: bool):
+    claim_words = words(claim)
+    print("=" * 78)
+    print(f"[{i}/{total}] {qid}: {question}\n")
+    print(textwrap.fill(f"CLAIM: {claim}", 78))
+    for p in cited:
+        print(f"\n[{p['id']}] {p['title']} ({p['url']})")
+        if full:
+            body = textwrap.fill(p["text"], 74)
+            print(textwrap.indent(highlight(body, claim_words), "    "))
+            continue
+        for sentence in preview(p["text"], claim):
+            wrapped = textwrap.fill(
+                sentence, 72, initial_indent="  ... ", subsequent_indent="      "
+            )
+            print(highlight(wrapped, claim_words))
+        n = len(re.split(r"(?<=[.!?])\s+", p["text"].strip()))
+        print(f"      (closest {PREVIEW_SENTENCES} of {n} sentences; press f for the full source)")
 
 
 def pipeline_label(record: dict, key: str) -> str | None:
@@ -74,6 +132,7 @@ def main() -> int:
     parser.add_argument("--seed", type=int, default=7)
     parser.add_argument("--out", type=Path, default=EVAL_DIR / "human_labels.jsonl")
     args = parser.parse_args()
+    os.system("")  # turns on ANSI colour handling in the Windows console
 
     records = load_results(EVAL_DIR / "results" / args.run_id / "results.jsonl")
     full_dir = get_settings().cache_dir / "runs" / args.run_id
@@ -86,17 +145,15 @@ def main() -> int:
         item = next(it for it in judge_items(record) if it.key == key)
         cached = full_dir / f"{qid}.json"
         passages = json.loads(cached.read_text(encoding="utf-8")) if cached.is_file() else []
-        print("=" * 78)
-        print(f"[{i}/{len(todo)}] {qid}: {record['question']}\n")
-        print(textwrap.fill(f"CLAIM: {item.text}", 78))
-        for p in passages:
-            if p["id"] in item.citation_ids:
-                print(f"\n[{p['id']}] {p['title']} ({p['url']})")
-                print(textwrap.indent(textwrap.fill(p["text"], 74), "    "))
+        cited = [p for p in passages if p["id"] in item.citation_ids]
+        show(i, len(todo), qid, record["question"], item.text, cited, full=False)
         while True:
-            answer = input("\nLabel (s/p/u, q=quit): ").strip().lower()
+            answer = input("\nLabel (s/p/u, f=full source, q=quit): ").strip().lower()
             if answer == "q":
                 return 0
+            if answer == "f":
+                show(i, len(todo), qid, record["question"], item.text, cited, full=True)
+                continue
             if answer in KEYS:
                 break
         with args.out.open("a", encoding="utf-8") as f:
