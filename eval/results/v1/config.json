@@ -1,7 +1,7 @@
 {
-  "run_id": "dev30",
-  "written_at": "2026-09-29T05:40:41+00:00",
-  "git_commit": "d9ff3c6",
+  "run_id": "v1",
+  "written_at": "2026-10-02T08:49:03+00:00",
+  "git_commit": "52cbcc5",
   "benchmark": "eval\\benchmark.jsonl",
   "benchmark_sha256": "9b50e4c8ff57d881",
   "pipeline_mode": "strict",

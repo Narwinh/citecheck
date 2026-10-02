@@ -1,9 +1,9 @@
 """Run the benchmark through the pipeline, judge every claim, and write a summary.
 
 Usage (from the repo root, with the backend venv):
-    backend/.venv/Scripts/python eval/run_eval.py --run-id dev30
-    backend/.venv/Scripts/python eval/run_eval.py --run-id dev30 --limit 5
-    backend/.venv/Scripts/python eval/run_eval.py --run-id dev30 --summarize-only
+    backend/.venv/Scripts/python eval/run_eval.py --run-id v1
+    backend/.venv/Scripts/python eval/run_eval.py --run-id v1 --limit 5
+    backend/.venv/Scripts/python eval/run_eval.py --run-id v1 --summarize-only
 
 Built for the Gemini free tier (20 requests/day/model):
 - Resumable. Each question's record is appended to results.jsonl as soon as it
@@ -179,7 +179,8 @@ def evaluate_question(
 
 def rejudge_pending(results: dict[str, dict], out: Path, full_dir: Path, judge_llm) -> None:
     for qid, record in results.items():
-        if record.get("status") != "ok" or record.get("judge"):
+        # "judge" present (even empty, for an answer with no claims) means judged.
+        if record.get("status") != "ok" or ("judge" in record and not record.get("judge_error")):
             continue
         cached = full_dir / f"{qid}.json"
         if not cached.is_file():
@@ -344,7 +345,7 @@ def main() -> int:
 
     parser = argparse.ArgumentParser(description="Run the CiteCheck benchmark.")
     parser.add_argument("--benchmark", type=Path, default=EVAL_DIR / "benchmark.jsonl")
-    parser.add_argument("--run-id", default="dev")
+    parser.add_argument("--run-id", default="v1")
     parser.add_argument("--limit", type=int, help="run at most N not-yet-done questions")
     parser.add_argument("--ids", help="comma-separated question ids to run")
     parser.add_argument("--no-judge", action="store_true")

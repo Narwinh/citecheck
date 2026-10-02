@@ -2,14 +2,14 @@
 // Runs before `next build`. If ../eval is not available (e.g. a deploy that
 // only contains frontend/), the committed data/eval.json is used unchanged.
 //
-//   EVAL_RUN=dev30 node scripts/sync-eval.mjs
+//   EVAL_RUN=v1 node scripts/sync-eval.mjs
 
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const here = dirname(fileURLToPath(import.meta.url));
-const run = process.env.EVAL_RUN ?? "dev30";
+const run = process.env.EVAL_RUN ?? "v1";
 const src = join(here, "..", "..", "eval", "results", run);
 const out = join(here, "..", "data", "eval.json");
 

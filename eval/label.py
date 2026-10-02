@@ -1,7 +1,7 @@
 """Hand-label a sample of claims, blind to the judge, for judge-vs-human agreement.
 
 Usage (from the repo root):
-    backend/.venv/Scripts/python eval/label.py --run-id dev30 --n 30
+    backend/.venv/Scripts/python eval/label.py --run-id v1 --n 30
 
 For each sampled claim you see the sentence and the full text of the passages it
 cites, then type S (supported), P (partial) or U (unsupported). The judge's
@@ -127,7 +127,7 @@ def sample(records: dict[str, dict], n: int, seed: int) -> list[tuple[str, str]]
 
 def main() -> int:
     parser = argparse.ArgumentParser(description="Blind hand-labelling of judged claims.")
-    parser.add_argument("--run-id", default="dev30")
+    parser.add_argument("--run-id", default="v1")
     parser.add_argument("--n", type=int, default=30)
     parser.add_argument("--seed", type=int, default=7)
     parser.add_argument("--out", type=Path, default=EVAL_DIR / "human_labels.jsonl")

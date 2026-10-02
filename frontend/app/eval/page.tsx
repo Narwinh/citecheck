@@ -12,7 +12,7 @@ export const metadata: Metadata = {
   description: "How much does verification reduce unsupported claims? Measured on a benchmark.",
 };
 
-const TARGET_QUESTIONS = 30;
+const TARGET_QUESTIONS = 100;
 
 function StatTile({ label, value, detail }: { label: string; value: string; detail?: string }) {
   return (
@@ -64,7 +64,7 @@ export default function EvalPage() {
           <div role="note" className="flex max-w-3xl gap-3 rounded-md border border-partial/50 bg-partial-soft/40 p-4">
             <TriangleAlert aria-hidden className="mt-0.5 size-4 shrink-0 text-partial" />
             <p className="font-serif text-[0.95rem] text-ink">
-              Preliminary: {s.questions.completed} of {TARGET_QUESTIONS} development questions have run so far.
+              Preliminary: {s.questions.completed} of {TARGET_QUESTIONS} benchmark questions have run so far.
               These numbers are real but too few to draw conclusions from, and will change as the benchmark
               completes.
             </p>

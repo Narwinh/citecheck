@@ -228,7 +228,7 @@ def question_rows(records: list[dict]) -> list[dict[str, Any]]:
                 "removed": sum(x["action"] == "removed" for x in revisions),
                 "unsupported_before": before["UNSUPPORTED"],
                 "unsupported_after": after["UNSUPPORTED"],
-                "judged": bool(judge),
+                "judged": "judge" in r and not r.get("judge_error"),
                 "total_ms": r.get("total_ms"),
                 "models": models,
             }
@@ -238,7 +238,8 @@ def question_rows(records: list[dict]) -> list[dict[str, Any]]:
 
 def summarize(records: list[dict], human: list[dict] | None = None) -> dict[str, Any]:
     ok = [r for r in records if r.get("status") == "ok"]
-    judged = [r for r in ok if r.get("judge")]
+    # An abstention has no claims, so its judge dict is empty but it was judged.
+    judged = [r for r in ok if "judge" in r and not r.get("judge_error")]
     return {
         "questions": {
             "total": len(records),
